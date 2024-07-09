@@ -26,9 +26,7 @@
                                 <span class="like-count">{{ $quote->likes }}</span>
                             </button>
                             <!-- Share Button -->
-                            <button class="btn btn-light btn-sm share-button" data-quote-id="{{ $quote->id }}">
-                                <i class="fas fa-share"></i> Share
-                            </button>
+                            
                             <!-- Comment Button -->
                             <button class="btn btn-light btn-sm comment-button" data-toggle="collapse" data-target="#comment-section-{{ $quote->id }}">
                                 <i class="far fa-comment"></i> Comment
@@ -37,6 +35,9 @@
                             <a href="{{ route('quotes.download', $quote->id) }}" class="btn btn-light btn-sm download-button">
                                 <i class="fas fa-download"></i> Download
                             </a>
+                            <button class="btn btn-light btn-sm share-button" data-quote-id="{{ $quote->id }}">
+                                <i class="fas fa-share"></i> Share
+                            </button>
                         </div>
 
                         <!-- Comment Section -->

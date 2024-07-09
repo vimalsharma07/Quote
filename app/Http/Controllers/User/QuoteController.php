@@ -128,15 +128,16 @@ public function download($id)
     $text = $quote->text; // Assuming the text of the quote is stored in the 'text' column
     $imagePath = public_path('storage/' . $quote->background_image);
 
-    // Define the text position, font size, and color
+    // Define the text position as percentages, font size, and color
     $fontSize = 5; // GD built-in font size
-    $x = $quote->text_x * 100; // Adjust the x-coordinate as needed
-    $y = $quote->text_y * 100; // Adjust the y-coordinate as needed
+    $xPercent = $quote->text_x*100; // x percentage
+    $yPercent = $quote->text_y*100; // y percentage
     $color = [255, 255, 255]; // White color for the text
+    $align = $quote->text_align; // Text alignment
 
     try {
         // Call the function to add text to the image
-        $newImagePath = addTextToImage($imagePath, $text, $fontSize, $x, $y, $color);
+        $newImagePath = addTextToImage($imagePath, $text, $fontSize, $xPercent, $yPercent, $color, $align);
 
         // Return the modified image for download
         return response()->download($newImagePath);
