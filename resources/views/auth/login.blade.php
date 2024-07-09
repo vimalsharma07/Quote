@@ -1,5 +1,11 @@
 @extends('layouts.front')
 
+<?php 
+if(Auth::check()){
+    return redirect('/');
+}
+
+?>
 @section('content')
 <div class="container">
     <div class="row justify-content-center">

@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\RegisterController as AdminRegisterController;
 use App\Http\Controllers\Admin\QuoteBackgroundController;
 use App\Http\Controllers\User\UserController as UserController;
 use App\Http\Controllers\User\QuoteController;
+use App\Http\Controllers\User\CommentController;
+
 use App\Http\Controllers\Front\FrontController;
 
 
@@ -63,6 +65,12 @@ Route::get('backgrounds', function () {
         'backgrounds' => App\Models\QuoteBackground::all()
     ]);
 })->name('backgrounds.index');
+
+// In web.php
+Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+Route::get('/quotes/{id}/download', [QuoteController::class, 'download'])->name('quotes.download');
+Route::post('/quotes/{id}/like', [QuoteController::class, 'like'])->name('quotes.like');
+
 // Default Authentication Routes (for other functionalities)
 Auth::routes();
 

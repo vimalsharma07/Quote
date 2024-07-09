@@ -4,9 +4,16 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quote;
+use App\Models\Like;
 use App\Models\QuoteBackground;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Image\Image;
+
+
+use DB;
+
 
 class QuoteController extends Controller
 {
@@ -47,6 +54,98 @@ class QuoteController extends Controller
     $quote = Quote::findOrFail($id);
     return view('quotes.show', compact('quote'));
 }
+
+
+public function like(Request $request, $id)
+{
+    $quote = Quote::findOrFail($id);
+    $user = auth()->user();
+
+    DB::transaction(function () use ($quote, $user) {
+        $like = Like::where('quote_id', $quote->id)->lockForUpdate()->first();
+        $totalUsers = $like ? json_decode($like->all_users, true) : [];
+        
+        // Check if the user has already liked the quote
+        if (in_array($user->id, $totalUsers)) {
+            // Remove the like
+            $quote->likes= $quote->likes-1;
+            
+
+            // Update the total users
+            $totalUsers = array_diff($totalUsers, [$user->id]);
+            if (count($totalUsers) > 0) {
+                $like->all_users = json_encode(array_values($totalUsers));
+                $like->update();
+            } else {
+                $like->delete();
+            }
+        } else {
+            
+            // Add a new like
+            $quote->likes = $quote->likes+1;
+            if ($like) {
+               
+                
+                $totalUsers[] = $user->id;
+                $like->all_users = json_encode(array_values(array_unique($totalUsers)));
+                $like->update();
+            } else {
+                
+                try {
+                    
+                    $newLike = new Like;
+                    $newLike->user_id = $quote->user_id;
+                    $newLike->quote_id = $quote->id;
+                    $newLike->all_users = json_encode([$user->id]);
+                    $newLike->save();
+                } catch (\Illuminate\Database\QueryException $ex) {
+                    // Handle duplicate entry error
+                    if ($ex->errorInfo[1] == 1062) {
+                        // Duplicate entry detected, refresh the like object
+                        $like = Like::where('quote_id', $quote->id)->lockForUpdate()->first();
+                        $totalUsers = json_decode($like->all_users, true);
+                        $totalUsers[] = $user->id;
+                        $like->all_users = json_encode(array_values(array_unique($totalUsers)));
+                        $like->update();
+                    } else {
+                        throw $ex;
+                    }
+                }
+            }
+        }
+    });
+  $quote->update();
+    return response()->json($quote);
+}
+
+
+
+
+public function download($id)
+{ 
+    $quote = Quote::findOrFail($id);
+
+    $text = $quote->text; // Assuming the text of the quote is stored in the 'text' column
+    $imagePath = public_path('storage/' . $quote->background_image);
+
+    // Define the text position, font size, and color
+    $fontSize = 5; // GD built-in font size
+    $x = $quote->text_x * 100; // Adjust the x-coordinate as needed
+    $y = $quote->text_y * 100; // Adjust the y-coordinate as needed
+    $color = [255, 255, 255]; // White color for the text
+
+    try {
+        // Call the function to add text to the image
+        $newImagePath = addTextToImage($imagePath, $text, $fontSize, $x, $y, $color);
+
+        // Return the modified image for download
+        return response()->download($newImagePath);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
+
 
 
 }

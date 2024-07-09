@@ -24,4 +24,7 @@ class QuoteController extends Controller
 
         return back()->with('success', 'Image uploaded successfully')->with('image', $imageName);
     }
+
+
+   
 }
