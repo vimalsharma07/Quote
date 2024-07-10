@@ -28,6 +28,21 @@
             max-width: 90%;
             cursor: move;
         }
+        .hashtag-suggestions {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            z-index: 1000;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .hashtag-suggestion {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .hashtag-suggestion:hover {
+            background-color: #f1f1f1;
+        }
     </style>
 </head>
 <body>
@@ -40,6 +55,15 @@
                 <div class="form-group">
                     <label for="quote-text">Enter your quote:</label>
                     <textarea id="quote-text" name="text" class="form-control" rows="4" placeholder="Write your quote here..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="quote-description">Description (optional):</label>
+                    <textarea id="quote-description" name="description" class="form-control" rows="2" placeholder="Add a description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="quote-tags">Tags (optional):</label>
+                    <input type="text" id="quote-tags" name="tags" class="form-control" placeholder="Add hashtags..." autocomplete="off">
+                    <div id="hashtag-suggestions" class="hashtag-suggestions d-none"></div>
                 </div>
                 <button type="button" class="btn btn-primary" id="next-step">Next</button>
             </div>
@@ -173,6 +197,49 @@
                     y: y - $('#selected-background').offset().top
                 };
             }
+
+            // Handle hashtag suggestions
+            $('#quote-tags').on('input', function() {
+                let query = $(this).val();
+                if (query.length > 1) {
+                    $.ajax({
+                        url: '{{ route('tags.suggest') }}',
+                        method: 'GET',
+                        data: { query: query },
+                        success: function(data) {
+                            let suggestions = data.tags;
+                            if (suggestions.length > 0) {
+                                let suggestionList = '';
+                                suggestions.forEach(tag => {
+                                    suggestionList += `<div class="hashtag-suggestion">#${tag}</div>`;
+                                });
+                                $('#hashtag-suggestions').html(suggestionList).removeClass('d-none');
+                            } else {
+                                $('#hashtag-suggestions').addClass('d-none');
+                            }
+                        },
+                        error: function() {
+                            $('#hashtag-suggestions').addClass('d-none');
+                        }
+                    });
+                } else {
+                    $('#hashtag-suggestions').addClass('d-none');
+                }
+            });
+
+            // Handle hashtag selection
+            $(document).on('click', '.hashtag-suggestion', function() {
+                let selectedTag = $(this).text();
+                let currentTags = $('#quote-tags').val();
+                $('#quote-tags').val(currentTags + ' ' + selectedTag).focus();
+                $('#hashtag-suggestions').addClass('d-none');
+            });
+
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#quote-tags').length && !$(e.target).closest('#hashtag-suggestions').length) {
+                    $('#hashtag-suggestions').addClass('d-none');
+                }
+            });
         });
     </script>
 </body>

@@ -7,7 +7,7 @@
             <div class="card">
                 <div class="card-header">{{ __('Register') }}</div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('register') }}">
+                    <form method="POST" action="{{ route('user-register') }}">
                         @csrf
                         <div class="form-group">
                             <label for="name">{{ __('Name') }}</label>
@@ -53,5 +53,7 @@
                             <label for="password-confirm">{{ __('Confirm Password') }}</label>
                             <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required>
                         </div>
+                           <button   type="submit"  class="btn btn-primary"> Register</button>
+                    </form>
+                    @endsection
 
-                        <div class="form

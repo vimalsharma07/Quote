@@ -15,7 +15,7 @@
                             <img src="{{ Storage::url($background->path) }}" class="card-img-top" alt="{{ $background->filename }}">
                         </a>
                         <div class="card-body">
-                            <h5 class="card-title">{{ $background->filename }}</h5>
+                            {{-- <h5 class="card-title">{{ $background->filename }}</h5> --}}
                             <form action="{{ route('admin.quote.background.destroy', $background->id) }}" method="POST" style="display: inline;">
                                 @csrf
                                 @method('DELETE')

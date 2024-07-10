@@ -16,6 +16,8 @@ class UserController extends Controller
     {
         return view('auth.login');
     }
+   
+    
 
     // Handle the login form submission
     public function login(Request $request)

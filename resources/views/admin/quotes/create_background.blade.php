@@ -1,5 +1,8 @@
 @extends('layouts.admin')
 @section( 'content')
+@php
+use Illuminate\Support\Facades\Session;
+@endphp
     @if ($message = Session::get('success'))
         <div>
             <strong>{{ $message }}</strong>
