@@ -41,6 +41,8 @@ class QuoteController extends Controller
         $quote->text_x = $request->input('text_x');
         $quote->text_y = $request->input('text_y');
         $quote->text_align = $request->input('text_align');
+        $quote->tags = $request->input('tags');
+        $quote->discription = $request->input('description');
         $quote->likes = 0;  // Default value
         $quote->comment = null;  // Default value
         $quote->save();

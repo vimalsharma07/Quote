@@ -108,7 +108,7 @@
                                 <ul class="nav flex-column pl-3">
                                     <!-- Logo Management -->
                                     <li class="nav-item">
-                                        <a class="nav-link {{ request()->is('admin/settings/logo') ? 'active' : '' }}" href="{{ url('admin/settings/logo') }}">
+                                        <a class="nav-link {{ request()->is('admin/media') ? 'active' : '' }}" href="{{ url('admin/media') }}">
                                             <i class="fas fa-image"></i> Logo & Media
                                         </a>
                                     </li>

@@ -60,4 +60,49 @@ class UserProfileController extends Controller
 
         return redirect()->route('profile.show', $id)->with('success', 'Profile updated successfully.');
     }
+
+
+    public function profileview(Request $request, $id){
+       
+        $loginuser= Auth::user();
+        
+        if(  isset($loginuser)  && isset($id)){
+
+            $isFollowing = $loginuser->isFollowing($id);
+            $user = User::find($id);
+            return view('user.profile.show', compact('user', 'isFollowing'));
+            }else{
+                return  redirect()-> route('login' );
+            }
+    }
+
+    public function follow($id)
+    {
+        $user = User::findOrFail($id);
+        $currentUser = Auth::user();
+    
+        if ($currentUser->id === $user->id) {
+            return response()->json(['success' => false], 400);
+        }
+    
+        $currentUser->follow($user->id);
+    
+        return response()->json(['success' => true]);
+    }
+    
+    public function unfollow($id)
+    {
+        $user = User::findOrFail($id);
+        $currentUser = Auth::user();
+    
+        if ($currentUser->id === $user->id) {
+            return response()->json(['success' => false], 400);
+        }
+    
+        $currentUser->unfollow($user->id);
+    
+        return response()->json(['success' => true]);
+    }
+
+    
 }

@@ -14,11 +14,17 @@
    
 </head>
 <body>
+    <?php
+    $media= DB::table('media')->first();
+            ?>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
-                <img src="{{ asset('path-to-your-logo.png') }}" alt="Logo">
-            </a>
+                @if($media && $media->logo)
+                <div class="logo">
+                    <img src="{{ asset('storage/media/logos/' . basename($media->logo)) }}" alt="Logo" style="height: 50px; border-radius:27%">
+                </div>
+            @endif            </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -127,13 +133,16 @@
             </div>
         </div>
         <div class="text-center p-3 bg-light">
-            © 2024 Quote App
+            2024 Quote App  © Made In India 
         </div>
     </footer>
 
     <!-- jQuery Full Version CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    @yield('scripts')
 </body>
 </html>

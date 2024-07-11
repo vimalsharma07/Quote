@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\RegisterController as AdminRegisterController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\QuoteBackgroundController;
 use App\Http\Controllers\Admin\TagsController;
+use App\Http\Controllers\Admin\SettingController;
+
 
 use App\Http\Controllers\User\UserController as UserController;
 use App\Http\Controllers\User\QuoteController;
@@ -73,6 +75,11 @@ Route::prefix('admin')->namespace('App\Http\Controllers\Admin')->group(function 
         Route::get('/tags', [TagsController::class, 'index'])->name('admin-tags-index');
         Route::get('/tag/create', [TagsController::class, 'create'])->name('admin-tags-create');
         Route::post('/store', [TagsController::class, 'store'])->name('admin.tags.store');
+//  Setting Controller
+
+Route::get('/media', [SettingController::class, 'media'])->name('admin-media');
+Route::post('/media/update', [SettingController::class, 'updatemedia'])->name('admin-media-update');
+
 
 
     });
@@ -101,6 +108,10 @@ Route::get('your-quotes', [FrontController::class, 'yourquotes'])->name('your-qu
 Route::get('/profile', [UserProfileController::class, 'show'])->name('profile.show');
 Route::get('/profile/{id}/edit', [UserProfileController::class, 'edit'])->name('profile.edit');
 Route::put('/profile/{id}', [UserProfileController::class, 'update'])->name('profile.update');
+Route::get('/profile/view/{id}', [UserProfileController::class, 'profileview'])->name('profile.view');
+Route::post('/profile/{id}/follow', [UserProfileController::class, 'follow'])->name('profile.follow');
+Route::post('profile/{id}/unfollow', [UserProfileController::class, 'unfollow'])->name('profile.unfollow');
+
 // Default Authentication Routes (for other functionalities)
 Auth::routes();
 
