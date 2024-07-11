@@ -13,10 +13,11 @@
                         <!-- User Details -->
                         <div class="user-details d-flex align-items-center mb-3">
                             <a href="{{url('profile/view/'.$user->id)}}">
-                            <img src="{{ $user->photo ? Storage::url('photos/' . $user->photo) : asset('images/default-profile.png') }}" alt="{{ $user->name }}" class="profile-picture"></a>
+                                <img src="{{ $user->photo ? Storage::url('photos/' . $user->photo) : asset('images/default-profile.png') }}" alt="{{ $user->name }}" class="profile-picture">
+                            </a>
                             <div class="ml-2">
                                 <a href="{{url('profile/view/'.$user->id)}}">
-                                <strong>{{ $user->name }}</strong>
+                                    <strong>{{ $user->name }}</strong>
                                 </a>
                                 <div class="text-muted">
                                     {{ $quote->created_at->diffForHumans() }}
@@ -57,7 +58,9 @@
                                     <span class="like-count">{{ $quote->likes }}</span>
                                 </button>
                                 <!-- Share Button -->
-                                
+                                <button class="btn btn-light btn-sm share-button" data-quote-id="{{ $quote->id }}">
+                                    <i class="fas fa-share"></i> Share
+                                </button>
                                 <!-- Comment Button -->
                                 <button class="btn btn-light btn-sm comment-button" data-toggle="collapse" data-target="#comment-section-{{ $quote->id }}">
                                     <i class="far fa-comment"></i> Comment
@@ -66,9 +69,6 @@
                                 <a href="{{ route('quotes.download', $quote->id) }}" class="btn btn-light btn-sm download-button">
                                     <i class="fas fa-download"></i> Download
                                 </a>
-                                <button class="btn btn-light btn-sm share-button" data-quote-id="{{ $quote->id }}">
-                                    <i class="fas fa-share-alt"></i> Share
-                                </button>
                             </div>
 
                             <!-- Comment Section -->
@@ -96,10 +96,42 @@
             @endforeach
         </div>
     </div>
+
+    <!-- Share Modal -->
+    <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shareModalLabel">Share Quote</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="capturedImage" src="" alt="Captured Quote" class="img-fluid mb-3">
+
+                    <button class="btn btn-success share-option" data-option="whatsapp">Share on WhatsApp</button>
+                    <button class="btn btn-primary share-option" data-option="facebook">Share on Facebook</button>
+                    <button class="btn btn-danger share-option" data-option="instagram">Share on Instagram</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
-<!-- jQuery for Like, Comment, and Share Button -->
 @section('scripts')
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Popper.js (required for Bootstrap 4 modals) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- dom-to-image -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+
 <script>
     $(document).ready(function() {
         const csrfToken = $('meta[name="csrf-token"]').attr('content');
@@ -147,21 +179,54 @@
         // Share Button
         $('.share-button').click(function() {
             const quoteId = $(this).data('quote-id');
-            $('#shareModal').data('quote-id', quoteId).modal('show'); // Set quoteId for modal and show it
+            const quoteElement = $(this).closest('.quote-post').find('.background-selector')[0];
+
+            domtoimage.toBlob(quoteElement)
+                .then(function(blob) {
+                    const formData = new FormData();
+                    formData.append('image', blob);
+                    formData.append('quote_id', quoteId);
+
+                    $.ajax({
+                        url: '/upload-captured-image',
+                        method: 'POST',
+                        headers: {
+                        'X-CSRF-TOKEN': csrfToken // Ensure CSRF token is sent
+                },
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            if (response.success) {
+                                $('#capturedImage').attr('src', response.image_url);
+                                $('#shareModal').data('image-url', response.image_url).data('quote-id', quoteId).modal('show');
+                            } else {
+                                alert('Failed to upload image');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Error:', xhr.responseText);
+                        }
+                    });
+                })
+                .catch(function(error) {
+                    console.error('dom-to-image error:', error);
+                });
         });
 
         // Share Options
         $('.share-option').click(function() {
             const option = $(this).data('option');
-            const quoteId = $('#shareModal').data('quote-id');
+            const imageUrl = $('#shareModal').data('image-url');
+            let shareUrl = '';
             switch (option) {
                 case 'whatsapp':
-                    const shareUrl = `https://wa.me/?text=Check%20out%20this%20quote!%20${window.location.origin}/quotes/${quoteId}`;
+                    shareUrl = `https://wa.me/?text=Check%20out%20this%20quote!%20${encodeURIComponent(imageUrl)}`;
                     window.open(shareUrl, '_blank');
                     break;
                 case 'facebook':
-                    const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}/quotes/${quoteId}`;
-                    window.open(fbShareUrl, '_blank');
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(imageUrl)}`;
+                    window.open(shareUrl, '_blank');
                     break;
                 case 'instagram':
                     alert('Sharing on Instagram is not supported through a direct link. Please use the Instagram app or website.');
@@ -169,85 +234,8 @@
                 default:
                     break;
             }
-            $('#shareModal').modal('hide'); // Close the share modal
-        });
-
-        // Comment Button
-        $('.comment-button').click(function() {
-            // Toggle comment section visibility
-            const target = $(this).data('target');
-            $(target).collapse('toggle');
+            $('#shareModal').modal('hide');
         });
     });
 </script>
-@endsection
-
-<!-- Share Modal -->
-
-<div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="shareModalLabel">Share Quote</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>Choose where you want to share this quote:</p>
-                <div class="d-flex flex-column">
-                    <button class="btn btn-light btn-sm share-option mb-2" data-option="whatsapp">
-                        <i class="fab fa-whatsapp"></i> Share on WhatsApp
-                    </button>
-                    <button class="btn btn-light btn-sm share-option mb-2" data-option="facebook">
-                        <i class="fab fa-facebook-f"></i> Share on Facebook
-                    </button>
-                    <button class="btn btn-light btn-sm share-option" data-option="instagram">
-                        <i class="fab fa-instagram"></i> Share on Instagram
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Add CSS for Share Modal -->
-
-@section('styles')
-<style>
-    .share-whatsapp-button, .share-facebook-button, .share-instagram-button {
-        margin-right: 5px;
-    }
-
-    .share-whatsapp-button {
-        background-color: #25D366;
-        color: #fff;
-    }
-
-    .share-whatsapp-button:hover {
-        background-color: #1DA851;
-    }
-
-    .share-facebook-button {
-        background-color: #3b5998;
-        color: #fff;
-    }
-
-    .share-facebook-button:hover {
-        background-color: #2d4373;
-    }
-
-    .share-instagram-button {
-        background-color: #E4405F;
-        color: #fff;
-    }
-
-    .share-instagram-button:hover {
-        background-color: #c13584;
-    }
-
-    .fa-whatsapp, .fa-facebook-f, .fa-instagram {
-        margin-right: 5px;
-    }
-</style>
 @endsection

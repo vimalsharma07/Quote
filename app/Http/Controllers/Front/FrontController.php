@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Quote;
 use App\Models\Like;
@@ -48,6 +49,20 @@ class FrontController extends Controller
     $query = $request->get('query');
     $tags = Tag::where('name', 'LIKE', '%' . $query . '%')->pluck('name');
     return response()->json(['tags' => $tags]);
+}
+
+
+
+public function uploadCapturedImage(Request $request)
+{
+    if ($request->hasFile('image')) {
+        $path = $request->file('image')->store('public/captured-images');
+        $url = Storage::url($path);
+
+        return response()->json(['success' => true, 'image_url' => url($url)]);
+    }
+
+    return response()->json(['success' => false, 'message' => 'Image upload failed.']);
 }
 
     
