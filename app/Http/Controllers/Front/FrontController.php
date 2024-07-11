@@ -65,5 +65,26 @@ public function uploadCapturedImage(Request $request)
     return response()->json(['success' => false, 'message' => 'Image upload failed.']);
 }
 
+public function downloadCapturedImage(Request $request)
+{
+    $this->validate($request, [
+        'image' => 'required|image',
+        'quote_id' => 'required|integer|exists:quotes,id',
+    ]);
+
+    $image = $request->file('image');
+    $quoteId = $request->input('quote_id');
+
+    // Handle image processing (if needed)
+    $path = $image->store('public/download-images');
+    $downloadUrl = Storage::url($path);
+
+    return response()->json([
+        'success' => true,
+        'download_url' => $downloadUrl
+    ]);
+}
+
+
     
 }

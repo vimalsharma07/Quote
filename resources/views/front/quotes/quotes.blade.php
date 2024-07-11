@@ -57,17 +57,16 @@
                                     <span class="like-count">{{ $quote->likes }}</span>
                                 </button>
                                 <!-- Share Button -->
-                                
+                               
                                 <!-- Comment Button -->
                                 <button class="btn btn-light btn-sm comment-button" data-toggle="collapse" data-target="#comment-section-{{ $quote->id }}">
                                     <i class="far fa-comment"></i> Comment
                                 </button>
                                 <!-- Download Button -->
-                                <a href="{{ route('quotes.download', $quote->id) }}" class="btn btn-light btn-sm download-button">
+                                <button class="btn btn-light btn-sm download-button" data-quote-id="{{ $quote->id }}">
                                     <i class="fas fa-download"></i> Download
-                                </a>
-                                 <!-- Share Button -->
-                                 <button class="btn btn-light btn-sm share-button" data-quote-id="{{ $quote->id }}">
+                                </button>
+                                <button class="btn btn-light btn-sm share-button" data-quote-id="{{ $quote->id }}">
                                     <i class="fas fa-share"></i> Share
                                 </button>
                             </div>
@@ -97,56 +96,30 @@
             @endforeach
         </div>
     </div>
+
+    <!-- Share Modal -->
+    <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shareModalLabel">Share Quote</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{-- <img id="capturedImage" src="" alt="Captured Quote" class="img-fluid mb-3"> --}}
+
+                    <button class="btn btn-success share-option" data-option="whatsapp">Share on WhatsApp</button>
+                    <button class="btn btn-primary share-option" data-option="facebook">Share on Facebook</button>
+                    <button class="btn btn-danger share-option" data-option="instagram">Share on Instagram</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
-<!-- jQuery for Like and Share Button -->
 @section('scripts')
-<script>
-    $(document).ready(function() {
-        const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-        $('.like-button').click(function() {
-            const button = $(this);
-            const quoteId = button.data('quote-id');
-            $.ajax({
-                url: `/quotes/${quoteId}/like`,
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                data: JSON.stringify({ quote_id: quoteId }),
-                contentType: 'application/json',
-                success: function(data) {
-                    if (data.liked) {
-                        button.addClass('liked');
-                        button.find('.like-icon').removeClass('far').addClass('fas');
-                    } else {
-                        button.removeClass('liked');
-                        button.find('.like-icon').removeClass('fas').addClass('far');
-                    }
-                    button.find('.like-count').text(data.likes);
-                },
-                error: function(xhr) {
-                    console.error('Error:', xhr.responseText);
-                }
-            });
-        });
-
-        $('.show-more-button').click(function() {
-            const descriptionText = $(this).siblings('.description-text');
-            if (descriptionText.hasClass('show-full')) {
-                descriptionText.removeClass('show-full');
-                $(this).text('Show more');
-            } else {
-                descriptionText.addClass('show-full');
-                $(this).text('Show less');
-            }
-        });
-
-        $('.share-button').click(function() {
-            const quoteId = $(this).data('quote-id');
-            alert(`Share this quote with ID: ${quoteId}`);
-        });
-    });
-</script>
+<script  src="{{asset('assets/quotes/js/quote.js')}}"></script>
 @endsection

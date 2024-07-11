@@ -123,30 +123,30 @@ public function like(Request $request, $id)
 
 
 
-public function download($id)
-{ 
-    $quote = Quote::findOrFail($id);
+// public function download($id)
+// { 
+//     $quote = Quote::findOrFail($id);
 
-    $text = $quote->text; // Assuming the text of the quote is stored in the 'text' column
-    $imagePath = public_path('storage/' . $quote->background_image);
+//     $text = $quote->text; // Assuming the text of the quote is stored in the 'text' column
+//     $imagePath = public_path('storage/' . $quote->background_image);
 
-    // Define the text position as percentages, font size, and color
-    $fontSize = 5; // GD built-in font size
-    $xPercent = $quote->text_x*100; // x percentage
-    $yPercent = $quote->text_y*100; // y percentage
-    $color = [255, 255, 255]; // White color for the text
-    $align = $quote->text_align; // Text alignment
+//     // Define the text position as percentages, font size, and color
+//     $fontSize = 5; // GD built-in font size
+//     $xPercent = $quote->text_x*100; // x percentage
+//     $yPercent = $quote->text_y*100; // y percentage
+//     $color = [255, 255, 255]; // White color for the text
+//     $align = $quote->text_align; // Text alignment
 
-    try {
-        // Call the function to add text to the image
-        $newImagePath = addTextToImage($imagePath, $text, $fontSize, $xPercent, $yPercent, $color, $align);
+//     try {
+//         // Call the function to add text to the image
+//         $newImagePath = addTextToImage($imagePath, $text, $fontSize, $xPercent, $yPercent, $color, $align);
 
-        // Return the modified image for download
-        return response()->download($newImagePath);
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
-    }
-}
+//         // Return the modified image for download
+//         return response()->download($newImagePath);
+//     } catch (\Exception $e) {
+//         return response()->json(['error' => $e->getMessage()], 500);
+//     }
+// }
 
 
 

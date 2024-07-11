@@ -36,6 +36,7 @@ Route::post('user/register', [UserController::class, 'register'])->name('user-re
 Route::get('quotes/{tag}', [FrontController::class, 'searchquotes'])->name('searchquotes');
 Route::get('/tags/suggest', [FrontController::class, 'suggest'])->name('tags.suggest');
 Route::post('/upload-captured-image', [FrontController::class, 'uploadCapturedImage']);
+Route::post('/download-captured-image', [FrontController::class, 'downloadCapturedImage'])->name('download.captured.image');
 
 
 
