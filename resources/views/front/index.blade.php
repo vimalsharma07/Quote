@@ -66,9 +66,8 @@
                                 <a href="{{ route('quotes.download', $quote->id) }}" class="btn btn-light btn-sm download-button">
                                     <i class="fas fa-download"></i> Download
                                 </a>
-                                 <!-- Share Button -->
-                                 <button class="btn btn-light btn-sm share-button" data-quote-id="{{ $quote->id }}">
-                                    <i class="fas fa-share"></i> Share
+                                <button class="btn btn-light btn-sm share-button" data-quote-id="{{ $quote->id }}">
+                                    <i class="fas fa-share-alt"></i> Share
                                 </button>
                             </div>
 
@@ -99,12 +98,13 @@
     </div>
 @endsection
 
-<!-- jQuery for Like and Share Button -->
+<!-- jQuery for Like, Comment, and Share Button -->
 @section('scripts')
 <script>
     $(document).ready(function() {
         const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
+        // Like Button
         $('.like-button').click(function() {
             const button = $(this);
             const quoteId = button.data('quote-id');
@@ -132,6 +132,7 @@
             });
         });
 
+        // Show More Button
         $('.show-more-button').click(function() {
             const descriptionText = $(this).siblings('.description-text');
             if (descriptionText.hasClass('show-full')) {
@@ -143,10 +144,110 @@
             }
         });
 
+        // Share Button
         $('.share-button').click(function() {
             const quoteId = $(this).data('quote-id');
-            alert(`Share this quote with ID: ${quoteId}`);
+            $('#shareModal').data('quote-id', quoteId).modal('show'); // Set quoteId for modal and show it
+        });
+
+        // Share Options
+        $('.share-option').click(function() {
+            const option = $(this).data('option');
+            const quoteId = $('#shareModal').data('quote-id');
+            switch (option) {
+                case 'whatsapp':
+                    const shareUrl = `https://wa.me/?text=Check%20out%20this%20quote!%20${window.location.origin}/quotes/${quoteId}`;
+                    window.open(shareUrl, '_blank');
+                    break;
+                case 'facebook':
+                    const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}/quotes/${quoteId}`;
+                    window.open(fbShareUrl, '_blank');
+                    break;
+                case 'instagram':
+                    alert('Sharing on Instagram is not supported through a direct link. Please use the Instagram app or website.');
+                    break;
+                default:
+                    break;
+            }
+            $('#shareModal').modal('hide'); // Close the share modal
+        });
+
+        // Comment Button
+        $('.comment-button').click(function() {
+            // Toggle comment section visibility
+            const target = $(this).data('target');
+            $(target).collapse('toggle');
         });
     });
 </script>
+@endsection
+
+<!-- Share Modal -->
+
+<div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareModalLabel">Share Quote</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Choose where you want to share this quote:</p>
+                <div class="d-flex flex-column">
+                    <button class="btn btn-light btn-sm share-option mb-2" data-option="whatsapp">
+                        <i class="fab fa-whatsapp"></i> Share on WhatsApp
+                    </button>
+                    <button class="btn btn-light btn-sm share-option mb-2" data-option="facebook">
+                        <i class="fab fa-facebook-f"></i> Share on Facebook
+                    </button>
+                    <button class="btn btn-light btn-sm share-option" data-option="instagram">
+                        <i class="fab fa-instagram"></i> Share on Instagram
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add CSS for Share Modal -->
+
+@section('styles')
+<style>
+    .share-whatsapp-button, .share-facebook-button, .share-instagram-button {
+        margin-right: 5px;
+    }
+
+    .share-whatsapp-button {
+        background-color: #25D366;
+        color: #fff;
+    }
+
+    .share-whatsapp-button:hover {
+        background-color: #1DA851;
+    }
+
+    .share-facebook-button {
+        background-color: #3b5998;
+        color: #fff;
+    }
+
+    .share-facebook-button:hover {
+        background-color: #2d4373;
+    }
+
+    .share-instagram-button {
+        background-color: #E4405F;
+        color: #fff;
+    }
+
+    .share-instagram-button:hover {
+        background-color: #c13584;
+    }
+
+    .fa-whatsapp, .fa-facebook-f, .fa-instagram {
+        margin-right: 5px;
+    }
+</style>
 @endsection
