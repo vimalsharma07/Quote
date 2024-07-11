@@ -60,7 +60,7 @@
                                
                                 <!-- Comment Button -->
                                 <button class="btn btn-light btn-sm comment-button" data-toggle="collapse" data-target="#comment-section-{{ $quote->id }}">
-                                    <i class="far fa-comment"></i> Comment
+                                    <i class="fa fa-comment"></i> Comment
                                 </button>
                                 <!-- Download Button -->
                                 <button class="btn btn-light btn-sm download-button" data-quote-id="{{ $quote->id }}">

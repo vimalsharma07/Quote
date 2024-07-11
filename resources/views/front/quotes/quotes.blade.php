@@ -57,10 +57,12 @@
                                     <span class="like-count">{{ $quote->likes }}</span>
                                 </button>
                                 <!-- Share Button -->
-                               
+                                @php 
+                                    $comments = App\Models\Comment::where('quote_id', $quote->id)->get();
+                                @endphp
                                 <!-- Comment Button -->
                                 <button class="btn btn-light btn-sm comment-button" data-toggle="collapse" data-target="#comment-section-{{ $quote->id }}">
-                                    <i class="far fa-comment"></i> Comment
+                                    <span class="mr-2"><i class="fa fa-comment"></i> @if(isset($comments)){{ count($comments) }} @endif</span>
                                 </button>
                                 <!-- Download Button -->
                                 <button class="btn btn-light btn-sm download-button" data-quote-id="{{ $quote->id }}">
@@ -81,9 +83,7 @@
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-sm">Post</button>
                                 </form>
-                                @php 
-                                    $comments = App\Models\Comment::where('quote_id', $quote->id)->get();
-                                @endphp
+                               
                                 @foreach($comments as $comment)
                                     <div class="comment mt-2">
                                         <strong>{{ $comment->user->name }}:</strong> {{ $comment->comment }}
