@@ -62,7 +62,7 @@
                                 @endphp
                                 <!-- Comment Button -->
                                 <button class="btn btn-light btn-sm comment-button" data-toggle="collapse" data-target="#comment-section-{{ $quote->id }}">
-                                    <span class="mr-2"><i class="fa fa-comment"></i> @if(isset($comments)){{ count($comments) }} @endif</span>
+                                    <span class="mr-2"><i class="fa fa-comment"></i> @if(isset($comments)){{ count($comments) }} @else 0 @endif</span>
                                 </button>
                                 <!-- Download Button -->
                                 <button class="btn btn-light btn-sm download-button" data-quote-id="{{ $quote->id }}">
