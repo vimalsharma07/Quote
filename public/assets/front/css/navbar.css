@@ -99,3 +99,38 @@
             transform: translate(-50%, -50%);
         }
    
+
+
+         /* Custom styles for the notification dropdown */
+         .notification-menu {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .notification-text {
+            flex: 1;
+        }
+
+        .notification-time {
+            color: gray;
+        }
+
+        .notification-item.unread .notification-text {
+            font-weight: bold;
+        }
+
+        @media (max-width: 767px) {
+            .notification-menu {
+                max-height: 200px;
+            }
+        }

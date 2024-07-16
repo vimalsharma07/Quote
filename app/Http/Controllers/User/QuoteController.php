@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Models\Like;
 use App\Models\QuoteBackground;
+use App\Models\Notification;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -25,14 +27,7 @@ class QuoteController extends Controller
 
     public function storeQuote(Request $request)
     {
-        // $request->validate([
-        //     'text' => 'required|string',
-        //     'background_image' => 'required|string',
-        //     'text_x' => 'required|numeric',
-        //     'text_y' => 'required|numeric',
-        //     'text_align' => 'required|string|in:left,right,center',
-        // ]);
-
+       
         // Create a new quote
         $quote = new Quote();
         $quote->user_id = auth()->user()->id;  // Assuming the user is authenticated
@@ -85,6 +80,12 @@ public function like(Request $request, $id)
             
             // Add a new like
             $quote->likes = $quote->likes+1;
+            $notification= new Notification;
+            $notification->user_id= $quote->user_id;
+            $notification->type= 'like';
+            $notification->link= '/quote/'.$quote->id;
+            $notification->data= ''.Auth::user()->name. ' liked  your photo';
+            $notification->save();
             if ($like) {
                
                 

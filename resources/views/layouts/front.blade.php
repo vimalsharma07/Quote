@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="{{ asset('assets/front/css/navbar.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/front/css/index.css') }}">
 
-   
+    
 </head>
 <body>
     <?php
-    $media= DB::table('media')->first();
-            ?>
+    $media = DB::table('media')->first();
+    ?>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
@@ -24,7 +24,8 @@
                 <div class="logo">
                     <img src="{{ asset('storage/media/logos/' . basename($media->logo)) }}" alt="Logo" style="height: 50px; border-radius:27%">
                 </div>
-            @endif            </a>
+                @endif
+            </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -44,7 +45,32 @@
                         <a class="nav-link {{ request()->is('quotes/yaari') ? 'active' : '' }}" href="{{ url('quotes/yaari') }}">Yaari Quotes</a>
                     </li>
                     @if(Auth::check())
-                    <?php $user = Auth::user(); ?>
+                    <?php
+                     $user = Auth::user();
+                     $readNotifications = $user->notifications->filter(function ($notification) {
+                            return $notification->read == 0;
+                        });
+                      ?>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" href="#" id="navbarDropdownNotifications" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-bell"></i>
+                            @if(($readNotifications->count()>0)  )
+                            <span class="badge badge-danger">{{ $readNotifications->count() }}</span>
+                            @endif
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right notification-menu" aria-labelledby="navbarDropdownNotifications">
+                            @forelse($user->notifications as $notification)
+                                <a class="dropdown-item notification-item {{ $notification->created_at }}" href="{{ $notification->link}}">
+                                    <i class="fas fa-bell notification-icon"></i>
+
+                                    <div class="notification-text">{{ $notification->data }}</div>
+                                    <div class="notification-time">{{ $notification->created_at->diffForHumans() }}</div>
+                                </a>
+                            @empty
+                                <p class="dropdown-item">No notifications</p>
+                            @endforelse
+                        </div>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUser" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-user"></i>
@@ -76,40 +102,48 @@
     @yield('content')
 
     <div class="bottom-nav">
-        {{-- <a href="{{ url('explore') }}" class="nav-link">
-            <i class="fas fa-compass"></i>
-            <span>Explore</span>
-        </a> --}}
-        <a href="{{ url('quotes/love') }}" class="nav-link">
-            <i class="fas fa-heart"></i>
-            <span>Love Quotes</span>
+        <a href="{{ url('/') }}" class="nav-link">
+            <i class="fas fa-home"></i>
         </a>
         <a href="{{ url('quotes/yaari') }}" class="nav-link">
             <i class="fas fa-handshake"></i>
-            <span>Yaari Quotes</span>
         </a>
         @if(Auth::check())
         <a href="{{ url('/create-quote') }}" class="nav-link">
             <i class="fas fa-plus"></i>
-            <span>Create Quote</span>
         </a>
         @else
         <a href="{{ url('/login') }}" class="nav-link">
             <i class="fas fa-plus"></i>
-            <span>Create Quote</span>
         </a>
+        @endif
+        @if(Auth::check())
+        <a href="#" class="nav-link" id="navbarDropdownNotificationsMobile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-bell"></i>
+            @if(Auth::check() && $user->notifications->count() > 0)
+            <span class="badge badge-danger">{{ $user->notifications->count() }}</span>
+            @endif
+        </a>
+        <div class="dropdown-menu dropdown-menu-right notification-menu" aria-labelledby="navbarDropdownNotificationsMobile">
+            @forelse($user->notifications as $notification)
+                <a class="dropdown-item notification-item {{ $notification->created_at}}" href="{{ $notification->link }}">
+                    <i class="fas fa-bell notification-icon"></i>
+                    <div class="notification-text">{{ $notification->data }}</div>
+                    <div class="notification-time">{{ $notification->created_at->diffForHumans() }}</div>
+                </a>
+            @empty
+                <p class="dropdown-item">No notifications</p>
+            @endforelse
+        </div>
         @endif
         @if(Auth::check())
         <a href="{{ url('profile/') }}" class="nav-link">
             <i class="fas fa-user"></i>
-            <span>Profile</span>
         </a>
         @else
         <a href="{{ url('profile/') }}" class="nav-link">
             <i class="fas fa-user"></i>
-            <span>Login</span>
         </a>
-        
         @endif
     </div>
 
@@ -127,21 +161,23 @@
                         <li><a href="{{ url('quotes/love') }}" class="text-dark">Love Quotes</a></li>
                         <li><a href="{{ url('quotes/yaari') }}" class="text-dark">Yaari Quotes</a></li>
                         <li><a href="{{ url('profile/') }}" class="text-dark">Profile</a></li>
-                        <li><a href="#!" class="text-dark">Contact Us</a></li>
                     </ul>
                 </div>
             </div>
         </div>
-        <div class="text-center p-3 bg-light">
-            2024 Quote App  © Made In India 
-        </div>
     </footer>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> 
+
+    <!-- jQuery (needed for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dom-to-image@2.6.0/src/dom-to-image.min.js"></script>
+
+
+    <script  src="{{asset('assets/quotes/js/quote.js')}}"></script>
+    <script  src="{{asset('assets/front/js/notification.js')}}"></script>
+
+
    
-    @yield('scripts')
 </body>
 </html>

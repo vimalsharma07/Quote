@@ -76,10 +76,10 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link collapsed" data-toggle="collapse" href="#settingsMenu" aria-expanded="false">
+                            <a class="nav-link collapsed" data-toggle="collapse" href="#TagsMenu" aria-expanded="false">
                                 <i class="fas fa-cogs"></i> Tags
                             </a>
-                            <div class="collapse" id="settingsMenu">
+                            <div class="collapse" id="TagsMenu">
                                 <ul class="nav flex-column pl-3">
                                     <!-- Logo Management -->
                                     <li class="nav-item">

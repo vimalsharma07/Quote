@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-namespace App\Models;
+ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,7 +10,6 @@ use Auth;
 
 class User extends Authenticatable
 {
-    use Notifiable;
 
     protected $fillable = [
         'name', 'email', 'phone', 'password',
@@ -34,29 +33,22 @@ class User extends Authenticatable
 
     // User.php
 
-    public function following()
-    {
-        return $this->hasOne(Follows::class, 'user_id', 'id')
-            ->select(['user_id', 'following'])
-            ->withDefault(['following' => '']);
-    }
+    
 
     // Define the relationship to get the list of followers
-    public function followers()
-    {
-        return $this->hasOne(Follows::class, 'user_id', 'id')
-            ->select(['user_id', 'followers'])
-            ->withDefault(['followers' => '']);
-    }
+    
 
     public function getFollowingListAttribute()
     {
-        return $this->following ? explode(',', $this->following) : [];
+       $data=  Follows::where('user_id', $this->id)->first();
+        return $data->following ? explode(',', $data->following) : [];
     }
 
     public function getFollowersListAttribute()
     {
-        return $this->followers ? explode(',', $this->followers) : [];
+        $data=  Follows::where('user_id', $this->id)->first();
+
+        return $data->followers ? explode(',', $data->followers) : [];
     }
 
     public function isFollowing($userId)
@@ -70,7 +62,6 @@ public function follow($userId)
 {
     $currentuser = Auth::user();
     $currentuser = User::find($currentuser->id);
-    
     // Increase the following count for the current user
     $currentuser->following += 1; // Increment the following count
     $currentuser->save(); // Save the changes
@@ -79,9 +70,14 @@ public function follow($userId)
     $euser = User::find($userId);
     $euser->followers += 1; // Increment the followers count
     $euser->save(); // Save the changes
+    $notification= new Notification;
+    $notification->user_id= User::find($userId)->id;
+    $notification->type= 'follow';
+    $notification->link= '/profile/view/'.Auth::user()->id;
+    $notification->data= ''.Auth::user()->name. ' started following you';
+    $notification->save();
     
-
-    $follows = $this->following()->firstOrCreate(['user_id' => $this->id]);
+    $follows = Follows::firstOrCreate(['user_id' => $this->id]);
     $following = $follows->following ? explode(',', $follows->following) : [];
     $following[] = $userId;
     $follows->following = implode(',', array_unique($following));
@@ -94,6 +90,11 @@ public function follow($userId)
     $followers[] = $this->id;
     $follower->followers = implode(',', array_unique($followers));
     $follower->save();
+
+    
+
+
+
 }
 
 // Unfollow a user
@@ -118,7 +119,7 @@ if ($euser->followers > 0) {
 }
 
 
-    $follows = $this->following()->where('user_id', $this->id)->first();
+    $follows = Follows::where('user_id', $this->id)->first();
     $following = $follows->following ? explode(',', $follows->following) : [];
     $following = array_diff($following, [$userId]);
     $follows->following = implode(',', $following);
@@ -131,6 +132,12 @@ if ($euser->followers > 0) {
     $follower->followers = implode(',', $followers);
     $follower->save();
 }
+
+public function notifications()
+{
+    return $this->hasMany(Notification::class);
+}
+
 
 
 }

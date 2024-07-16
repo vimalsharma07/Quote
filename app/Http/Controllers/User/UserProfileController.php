@@ -87,7 +87,7 @@ class UserProfileController extends Controller
     
         $currentUser->follow($user->id);
     
-        return response()->json(['success' => true]);
+        return redirect()->back()->with(['success' => true]);
     }
     
     public function unfollow($id)
@@ -101,7 +101,7 @@ class UserProfileController extends Controller
     
         $currentUser->unfollow($user->id);
     
-        return response()->json(['success' => true]);
+        return redirect()->back()->with(['success' => true]);
     }
 
     

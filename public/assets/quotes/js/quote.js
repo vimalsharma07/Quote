@@ -64,8 +64,10 @@
                         success: function(response) {
                             if (response.success) {
                                 $('#capturedImage').attr('src', response.image_url);
-                                $('#shareModal').data('image-url', response.image_url).data('quote-id', quoteId).modal('show');
-                            } else {
+                                document.getElementById('shareModal').setAttribute('data-image-url', response.image_url);
+                                document.getElementById('shareModal').setAttribute('data-quote-id', quoteId);
+                                new bootstrap.Modal(document.getElementById('shareModal')).show();
+                                                            } else {
                                 alert('Failed to upload image');
                             }
                         },

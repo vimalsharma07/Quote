@@ -85,6 +85,10 @@ public function downloadCapturedImage(Request $request)
     ]);
 }
 
+public  function  quote($id){
+   $quote=  Quote::where('id', $id)->get();
+   return view('front.quotes.quotes',['quotes'=>$quote]);
 
+}
     
 }

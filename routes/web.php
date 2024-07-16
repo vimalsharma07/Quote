@@ -14,6 +14,8 @@ use App\Http\Controllers\User\QuoteController;
 use App\Http\Controllers\User\CommentController;
 use App\Http\Controllers\User\UserProfileController;
 use App\Http\Controllers\Front\FrontController;
+use App\Http\Controllers\Front\NotificationController;
+
 use Illuminate\Support\Facades\Auth;
 
 
@@ -34,9 +36,14 @@ Route::post('user/register', [UserController::class, 'register'])->name('user-re
 // Frontend Home Route
 
 Route::get('quotes/{tag}', [FrontController::class, 'searchquotes'])->name('searchquotes');
+Route::get('quote/{id}', [FrontController::class, 'quote'])->name('quote');
 Route::get('/tags/suggest', [FrontController::class, 'suggest'])->name('tags.suggest');
 Route::post('/upload-captured-image', [FrontController::class, 'uploadCapturedImage']);
 Route::post('/download-captured-image', [FrontController::class, 'downloadCapturedImage'])->name('download.captured.image');
+
+//Notification Controller
+// web.php (Routes file)
+Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 
 
 
