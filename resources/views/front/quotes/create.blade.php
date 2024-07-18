@@ -43,15 +43,36 @@
         .hashtag-suggestion:hover {
             background-color: #f1f1f1;
         }
+        @media (max-width: 767px) {
+            #createaquote {
+                display: none;
+            }
+            #next_prev_buttons{
+                background: white;
+                color:#c27c7c;
+                position: absolute;
+                top: 0px;
+                
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h2>Create a Quote</h2>
+        <h2 id="createaquote">Create a Quote</h2>
+        @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {!! session('success') !!}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
         <form method="POST" action="{{ route('quotes.store') }}">
             @csrf
             <!-- Step 1: Text Input -->
             <div id="text-step" class="mb-4">
+                
                 <div class="form-group">
                     <label for="quote-text">Enter your quote:</label>
                     <textarea id="quote-text" name="text" class="form-control" rows="4" placeholder="Write your quote here..." required></textarea>
@@ -69,8 +90,17 @@
             </div>
 
             <!-- Step 2: Background Selection -->
+           
+            
             <div id="background-step" class="d-none mb-4">
-                <div class="background-selector" id="selected-background">
+
+                <div class="d-flex justify-content-center my-3"  id="next_prev_buttons">
+                    <button class="mx-1 mr-4"><i class="fa fa-arrow-left"></i></button>
+                       <h6>Choose Wallpaper</h6>
+                    <button class="mx-2 ml-4"><i class="fa fa-arrow-right"></i></button>
+                </div>
+
+                <div class="background-selector mt-4" id="selected-background">
                     <!-- Quote text will be inserted here dynamically -->
                     <div class="quote-text" id="quote-text-display" contenteditable="true"></div>
                 </div>
@@ -84,8 +114,8 @@
                 <input type="hidden" name="text_x" id="text-x-hidden">
                 <input type="hidden" name="text_y" id="text-y-hidden">
                 <input type="hidden" name="text_align" id="text-align-hidden" value="center">
-                <button type="submit" class="btn btn-primary mt-3">Post</button>
-                <a href="{{ url('/create-quote') }}" class="btn btn-secondary mt-3">Back</a>
+                {{-- <button type="submit" class="btn btn-primary mt-3">Post</button>
+                <a href="{{ url('/create-quote') }}" class="btn btn-secondary mt-3">Back</a> --}}
             </div>
         </form>
     </div>
@@ -105,8 +135,8 @@
                         // Remove 'public' from the path
                         let pathWithoutPublic = background.path.replace('public/', '');
                         thumbnails += `
-                            <div class="col-md-3 mb-2">
-                                <img src="{{ Storage::url('${pathWithoutPublic}') }}" class="thumbnail img-fluid" data-background="${pathWithoutPublic}">
+                            <div class="col-4 mb-2">
+                                <img src="{{ Storage::url('${pathWithoutPublic}') }}" class="thumbnail img-fluid" data-background="${pathWithoutPublic}" height="30px">
                             </div>
                         `;
                     });
@@ -227,18 +257,12 @@
                 }
             });
 
-            // Handle hashtag selection
+            // Handle hashtag suggestion click
             $(document).on('click', '.hashtag-suggestion', function() {
                 let selectedTag = $(this).text();
                 let currentTags = $('#quote-tags').val();
                 $('#quote-tags').val(currentTags + ' ' + selectedTag).focus();
                 $('#hashtag-suggestions').addClass('d-none');
-            });
-
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('#quote-tags').length && !$(e.target).closest('#hashtag-suggestions').length) {
-                    $('#hashtag-suggestions').addClass('d-none');
-                }
             });
         });
     </script>

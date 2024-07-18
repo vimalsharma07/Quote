@@ -1,28 +1,56 @@
 @extends('layouts.front')
 
 @section('content')
-    <div class="container mt-5">
+            <div class="container mt-5">
+                @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+
+
         <div class="row">
             @foreach($quotes as $quote)
                 @php
                     $imagePath = Storage::url($quote->background_image);
-                    $user = $quote->user; // Assuming you have a relationship defined in your Quote model
+                    $user = $quote->user; 
+                    $currentuser = Auth::user();
                 @endphp
                 <div class="col-md-4 col-sm-6 col-12 mb-4">
+
                     <div class="quote-post">
                         <!-- User Details -->
                         <div class="user-details d-flex align-items-center mb-3">
-                            <a href="{{url('profile/view/'.$user->id)}}">
-                            <img src="{{ $user->photo ? Storage::url('photos/' . $user->photo) : asset('images/default-profile.png') }}" alt="{{ $user->name }}" class="profile-picture"></a>
+                            <a href="{{ url('profile/view/'.$user->id) }}">
+                                <img src="{{ $user->photo ? Storage::url('photos/' . $user->photo) : asset('images/default-profile.png') }}" alt="{{ $user->name }}" class="profile-picture">
+                            </a>
                             <div class="ml-2">
-                                <a href="{{url('profile/view/'.$user->id)}}">
-                                <strong>{{ $user->name }}</strong>
+                                <a href="{{ url('profile/view/'.$user->id) }}">
+                                    <strong>{{ $user->name }}</strong>
                                 </a>
                                 <div class="text-muted">
                                     {{ $quote->created_at->diffForHumans() }}
                                 </div>
                             </div>
+                            @if($user->id== $currentuser->id)
+                            <div class="ml-auto mr-4">
+                                <div class="dropdown">
+                                    <a href="#" id="optionsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="optionsDropdown">
+                                        <a class="dropdown-item" href="#">Edit</a>
+                                        <a class="dropdown-item" href="{{url('quotes/delete/'.$quote->id)}}">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                            
                         </div>
+                        
                         
                         <!-- Display the background image and quote text -->
                         <div class="background-selector" style="background-image: url('{{ $imagePath }}'); background-size: contain; background-repeat: no-repeat; background-position: center;">
@@ -120,6 +148,5 @@
 @endsection
 
 @section('scripts')
-
 <script  src="{{asset('assets/quotes/js/quote.js')}}"></script>
 @endsection

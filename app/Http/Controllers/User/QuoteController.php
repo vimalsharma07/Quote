@@ -30,7 +30,7 @@ class QuoteController extends Controller
        
         // Create a new quote
         $quote = new Quote();
-        $quote->user_id = auth()->user()->id;  // Assuming the user is authenticated
+        $quote->user_id = auth()->user()->id;  
         $quote->text = $request->input('text');
         $quote->background_image = $request->input('background_image');
         $quote->text_x = $request->input('text_x');
@@ -42,7 +42,7 @@ class QuoteController extends Controller
         $quote->comment = null;  // Default value
         $quote->save();
 
-        return redirect()->route('create-quote')->with('success', 'Quote created successfully.');
+        return redirect()->back()->with('success', 'Quote created successfully. <a href="'.url('/quote/'.$quote->id).'">View</a>');
     }
 
 
@@ -83,7 +83,7 @@ public function like(Request $request, $id)
             $notification= new Notification;
             $notification->user_id= $quote->user_id;
             $notification->type= 'like';
-            $notification->link= '/quote/'.$quote->id;
+            $notification->link= '/quotefind/'.$quote->id;
             $notification->data= ''.Auth::user()->name. ' liked  your photo';
             $notification->save();
             if ($like) {
@@ -150,6 +150,20 @@ public function like(Request $request, $id)
 // }
 
 
+        public function delete($id){
+            
+            $user = Auth::user();
+           $quote=  Quote::where('id', $id)->first();
+           if($quote->user_id== $user->id){
+            $quote->delete();
+            
+            return redirect()->back()->with('success','Quote Deleted Successfully');
+
+           }else{
+            return redirect()->back()->with('success','You have not acess to delete this Quote');
+
+           }
+        }
 
 
 }

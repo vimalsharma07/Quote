@@ -30,7 +30,7 @@ class FrontController extends Controller
 
     public function yourquotes(Request $request){
         $user = Auth::user();
-     $quotes=    Quote::where('user_id', $user->id)->get();
+     $quotes=    Quote::where('user_id', $user->id)->orderBy('id', 'desc')->get();
      return view('front.quotes.quotes',['quotes'=>$quotes]);
 
         
@@ -38,7 +38,7 @@ class FrontController extends Controller
 
     public function searchquotes(Request $request, $tag){
 
-     $quotes=  Quote::where('tags', 'Like', '%'.$tag.'%')->orwhere('discription', 'Like', '%'.$tag.'%')->get();
+     $quotes=  Quote::where('tags', 'Like', '%'.$tag.'%')->orwhere('discription', 'Like', '%'.$tag.'%')->orderBy('id','desc')->get();
      return view('front.quotes.quotes',['quotes'=>$quotes]);
 
     }
@@ -85,7 +85,7 @@ public function downloadCapturedImage(Request $request)
     ]);
 }
 
-public  function  quote($id){
+public  function  quote ($id){
    $quote=  Quote::where('id', $id)->get();
    return view('front.quotes.quotes',['quotes'=>$quote]);
 

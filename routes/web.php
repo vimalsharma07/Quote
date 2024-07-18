@@ -36,7 +36,7 @@ Route::post('user/register', [UserController::class, 'register'])->name('user-re
 // Frontend Home Route
 
 Route::get('quotes/{tag}', [FrontController::class, 'searchquotes'])->name('searchquotes');
-Route::get('quote/{id}', [FrontController::class, 'quote'])->name('quote');
+Route::get('quotefind/{id}', [FrontController::class, 'quote'])->name('quote');
 Route::get('/tags/suggest', [FrontController::class, 'suggest'])->name('tags.suggest');
 Route::post('/upload-captured-image', [FrontController::class, 'uploadCapturedImage']);
 Route::post('/download-captured-image', [FrontController::class, 'downloadCapturedImage'])->name('download.captured.image');
@@ -103,6 +103,9 @@ Route::get('backgrounds', function () {
         'backgrounds' => App\Models\QuoteBackground::all()
     ]);
 })->name('backgrounds.index');
+
+Route::get('/quotes/delete/{id}', [QuoteController::class, 'delete'])->name('quote.delete');
+
 
 // In web.php
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
