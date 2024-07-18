@@ -86,6 +86,13 @@
                     <input type="text" id="quote-tags" name="tags" class="form-control" placeholder="Add hashtags..." autocomplete="off">
                     <div id="hashtag-suggestions" class="hashtag-suggestions d-none"></div>
                 </div>
+                <div class="form-group">
+                    <input type="checkbox" name="writtername" checked  id="defaultwritter"> use my name as a writter 
+                </div>
+                <div class="form-group d-none" id ="writtersection">
+                    <label for="quote-tags">Writter  (optional):</label>
+                    <input type="text" id="writter" name="writter" class="form-control" placeholder="Writter Name Eg Gulzar" autocomplete="off">
+                </div>
                 <button type="button" class="btn btn-primary" id="next-step">Next</button>
             </div>
 
