@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\QuoteBackgroundController;
 use App\Http\Controllers\Admin\TagsController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\CategoryController;
 
 
 use App\Http\Controllers\User\UserController as UserController;
@@ -28,7 +29,7 @@ Route::get('/home', function () {
 
 // User the login form
 Route::get('login', [UserController::class, 'showLoginForm'])->name('login');
-Route::post('login', [UserController::class, 'login']);
+Route::post('user/login', [UserController::class, 'login']);
 Route::post('logout', [UserController::class, 'logout'])->name('logout');
 Route::get('user/register', [UserController::class, 'showRegistrationForm'])->name('register');
 Route::post('user/register', [UserController::class, 'register'])->name('user-register');
@@ -36,7 +37,7 @@ Route::post('user/register', [UserController::class, 'register'])->name('user-re
 // Frontend Home Route
 
 Route::get('quotes/{tag}', [FrontController::class, 'searchquotes'])->name('searchquotes');
-Route::get('quotefind/{id}', [FrontController::class, 'quote'])->name('quote');
+Route::get('quote/{id}', [FrontController::class, 'quote'])->name('quote');
 Route::get('/tags/suggest', [FrontController::class, 'suggest'])->name('tags.suggest');
 Route::post('/upload-captured-image', [FrontController::class, 'uploadCapturedImage']);
 Route::post('/download-captured-image', [FrontController::class, 'downloadCapturedImage'])->name('download.captured.image');
@@ -84,12 +85,24 @@ Route::prefix('admin')->namespace('App\Http\Controllers\Admin')->group(function 
         Route::get('/tags', [TagsController::class, 'index'])->name('admin-tags-index');
         Route::get('/tag/create', [TagsController::class, 'create'])->name('admin-tags-create');
         Route::post('/store', [TagsController::class, 'store'])->name('admin.tags.store');
+        Route::get('/admin/tag/{id}', [TagController::class, 'destroy'])->name('admin.tags.destroy'); // Delete a tag
+        Route::put('admin/tag/{id}', [TagController::class, 'update'])->name('admin.tags.update'); // Update tag status
 //  Setting Controller
 
-Route::get('/media', [SettingController::class, 'media'])->name('admin-media');
-Route::post('/media/update', [SettingController::class, 'updatemedia'])->name('admin-media-update');
+        Route::get('/media', [SettingController::class, 'media'])->name('admin-media');
+        Route::post('/media/update', [SettingController::class, 'updatemedia'])->name('admin-media-update');
 
 
+        Route::prefix('/
+        ')->name('admin.categories.')->group(function () {
+            Route::get('/', [CategoryController::class, 'index'])->name('index');
+            Route::get('/create', [CategoryController::class, 'create'])->name('create');
+            Route::post('/', [CategoryController::class, 'store'])->name('store');
+            Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
+            Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
+            Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
+        });
+        
 
     });
 });

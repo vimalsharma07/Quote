@@ -11,7 +11,6 @@
                 </div>
             @endif
 
-
         <div class="row">
             @foreach($quotes as $quote)
                 @php
@@ -42,7 +41,7 @@
                                         <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="optionsDropdown">
-                                        <a class="dropdown-item" href="#">Edit</a>
+                                        <a class="dropdown-item" href="{{url('quotes/edit/'.$quote->id)}}">Edit</a>
                                         <a class="dropdown-item" href="{{url('quotes/delete/'.$quote->id)}}">Delete</a>
                                     </div>
                                 </div>

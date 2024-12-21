@@ -44,25 +44,24 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('quotes/yaari') ? 'active' : '' }}" href="{{ url('quotes/yaari') }}">Yaari Quotes</a>
                     </li>
-                    @if(Auth::check())
-                    <?php
-                     $user = Auth::user();
-                     $readNotifications = $user->notifications->filter(function ($notification) {
-                            return $notification->read == 0;
-                        });
-                      ?>
+                    @auth
+                    @php
+                        $user = Auth::user();
+                        $notifications = optional($user->notifications) ?? collect(); // Ensure it's a collection
+                        $readNotifications = $notifications->filter(fn($notification) => is_null($notification->read_at));
+                    @endphp
+                
                     <li class="nav-item dropdown">
                         <a class="nav-link" href="#" id="navbarDropdownNotifications" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-bell"></i>
-                            @if(($readNotifications->count()>0)  )
-                            <span class="badge badge-danger">{{ $readNotifications->count() }}</span>
+                            @if(isset($readNotifications) && $readNotifications->count() > 0)
+                                <span class="badge badge-danger">{{ $readNotifications->count() }}</span>
                             @endif
                         </a>
                         <div class="dropdown-menu dropdown-menu-right notification-menu" aria-labelledby="navbarDropdownNotifications">
-                            @forelse($user->notifications as $notification)
-                                <a class="dropdown-item notification-item {{ $notification->created_at }}" href="{{ $notification->link}}">
+                            @forelse($notifications as $notification)
+                                <a class="dropdown-item notification-item" href="{{ $notification->link }}">
                                     <i class="fas fa-bell notification-icon"></i>
-
                                     <div class="notification-text">{{ $notification->data }}</div>
                                     <div class="notification-time">{{ $notification->created_at->diffForHumans() }}</div>
                                 </a>
@@ -71,6 +70,8 @@
                             @endforelse
                         </div>
                     </li>
+                @endauth
+                
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUser" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-user"></i>
@@ -87,7 +88,7 @@
                             </form>
                         </div>
                     </li>
-                    @else
+                    @if(!Auth::check())
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('login') }}">
                             <i class="fas fa-user"></i>
@@ -120,9 +121,8 @@
         @if(Auth::check())
         <a href="#" class="nav-link" id="navbarDropdownNotificationsMobile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-bell"></i>
-            @if(Auth::check() && $user->notifications->count() > 0)
+            @if(Auth::check() &&  isset($user->notifications) && $user->notifications->count() > 0)
             <span class="badge badge-danger">{{ $user->notifications->count() }}</span>
-            @endif
         </a>
         <div class="dropdown-menu dropdown-menu-right notification-menu" aria-labelledby="navbarDropdownNotificationsMobile">
             @forelse($user->notifications as $notification)
@@ -135,6 +135,8 @@
                 <p class="dropdown-item">No notifications</p>
             @endforelse
         </div>
+        @endif
+
         @endif
         @if(Auth::check())
         <a href="{{ url('profile/') }}" class="nav-link">

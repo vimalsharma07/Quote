@@ -9,7 +9,8 @@ use App\Models\Tag;
 class TagsController extends Controller
 {
     public function index(){
-        return view ('admin.tag.index');
+        $tags = Tag::paginate(10); // Adjust per-page count as needed
+        return view ('admin.tag.index' ,['tags'=>$tags]);
     }
 
 
@@ -33,5 +34,20 @@ class TagsController extends Controller
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Tag created successfully!');
     }
+
+
+    public function update(Request $request, $id)
+{
+    $tag = Tag::findOrFail($id);
+    $tag->update(['status' => $request->status]);
+    return redirect()->route('admin.tags.index')->with('success', 'Tag status updated successfully.');
+}
+
+public function destroy($id)
+{
+    Tag::findOrFail($id)->delete();
+    return redirect()->route('admin.tags.index')->with('success', 'Tag deleted successfully.');
+}
+
     
 }
