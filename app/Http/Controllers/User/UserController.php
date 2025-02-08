@@ -54,9 +54,17 @@ class UserController extends Controller
     // Handle user logout
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::user()->logout();
+        
+        // Invalidate the session
+        $request->session()->invalidate();
+    
+        // Regenerate the session token to prevent CSRF attacks
+        $request->session()->regenerateToken();
+    
         return redirect('/');
     }
+    
 
     // Show the registration form
     public function showRegistrationForm()

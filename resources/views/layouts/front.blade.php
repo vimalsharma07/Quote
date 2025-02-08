@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @yield('meta')
-    <title>Quote App</title>
+    <title>Dolafz</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/front/css/navbar.css') }}">
@@ -71,7 +71,7 @@
                         </div>
                     </li>
                 @endauth
-                
+                @if(Auth::user())
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUser" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-user"></i>
@@ -88,7 +88,7 @@
                             </form>
                         </div>
                     </li>
-                    @if(!Auth::check())
+                    @else
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('login') }}">
                             <i class="fas fa-user"></i>

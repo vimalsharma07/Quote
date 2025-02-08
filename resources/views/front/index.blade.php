@@ -34,7 +34,7 @@
                                     {{ $quote->created_at->diffForHumans() }}
                                 </div>
                             </div>
-                            @if($user->id== $currentuser->id)
+                            @if(isset($user) &&  isset($currentuser)  &&  $user->id== $currentuser->id)
                             <div class="ml-auto mr-4">
                                 <div class="dropdown">
                                     <a href="#" id="optionsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

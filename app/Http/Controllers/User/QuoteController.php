@@ -7,7 +7,6 @@ use App\Models\Quote;
 use App\Models\Like;
 use App\Models\QuoteBackground;
 use App\Models\Notification;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -30,7 +29,7 @@ class QuoteController extends Controller
        
         // Create a new quote
         $quote = new Quote();
-        $quote->user_id = auth()->user()->id;  
+        $quote->user_id = Auth::user()->id;  
         $quote->text = $request->input('text');
         $quote->background_image = $request->input('background_image');
         $quote->text_x = $request->input('text_x');

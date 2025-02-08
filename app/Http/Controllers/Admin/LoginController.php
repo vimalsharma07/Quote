@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
@@ -26,11 +26,11 @@ class LoginController extends Controller
         
         
 
-        $admin = Admin::where('email', $request->email)->first();
+        $admin = User::where('email', $request->email)->first();
 
         if ($admin && $request->password=='admin@123') {
             // Log the admin in manually
-            Auth::guard('admin')->login($admin);        
+            Auth::login($admin);        
                 return redirect()->route('admin.dashboard');
         }
 
@@ -39,7 +39,7 @@ class LoginController extends Controller
 
     public function logout()
     {
-        Auth::guard('admin')->logout();
+        Auth::user()->logout();
         return redirect()->route('admin.login');
     }
 }
