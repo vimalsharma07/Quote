@@ -64,9 +64,7 @@ Route::prefix('admin')->namespace('App\Http\Controllers\Admin')->group(function 
 
     // Admin Dashboard Routes
     Route::middleware(['auth:admin'])->group(function () {
-        Route::get('dashboard', function () {
-            return view('admin.dashboard');
-        })->name('admin.dashboard');
+        Route::get('dashboard', function () { return view('admin.dashboard');})->name('admin.dashboard');
 
         // Quote Background Routes
         Route::get('quote/background', [QuoteBackgroundController::class, 'index'])->name('admin.quote.background.index');
