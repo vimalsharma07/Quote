@@ -53,8 +53,9 @@ $(document).ready(function () {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
             },
             success: function (response) {
+                console.log(response);
                 if (response.success) {
-                    window.location.href = response.redirect;
+                    window.location.href = '/';
                 } else {
                     $("#error-msg").removeClass("d-none").text(response.message);
                 }

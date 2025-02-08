@@ -34,16 +34,15 @@ class UserController extends Controller
             $user = User::where('email', $request->email)->first();
             if (Hash::check($request->password, $user->password)) {
                 Auth::login($user);
-                return redirect('/');
                 // User exists and password matches
-                return response()->json(['message' => 'Login successful'], 200);
+                return response()->json([  'message' => 'Login successful', 'success'=>true], 200);
             } else {
                 // Password does not match
-                return response()->json(['message' => 'Invalid credentials'], 401);
+                return response()->json(['message' => 'Invalid credentials', 'success'=>false], 401);
             }
         } else {
             // Email does not exist
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            return response()->json(['message' => 'Invalid credentials' , 'success'=>false], 401);
         }
 
         return back()->withErrors([
