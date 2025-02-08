@@ -1,6 +1,7 @@
 @extends('layouts.front')
 
 @section('content')
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -34,20 +35,26 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    $.ajaxSetup({
+    headers: {
+        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+    }
+});
+
 $(document).ready(function () {
     $("#loginForm").submit(function (event) {
-        event.preventDefault(); // Page reload hone se roko
-        
+        event.preventDefault(); // Default submit ko rokna
+
         $.ajax({
-            url: "{{ route('userlogin') }}", // Laravel route
+            url: "{{ route('userlogin') }}",
             type: "POST",
-            data: $(this).serialize(), // Form data serialize karo
+            data: $(this).serialize(),
             headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
             },
             success: function (response) {
                 if (response.success) {
-                    window.location.href = response.redirect; // Redirect on success
+                    window.location.href = response.redirect;
                 } else {
                     $("#error-msg").removeClass("d-none").text(response.message);
                 }
@@ -59,6 +66,7 @@ $(document).ready(function () {
         });
     });
 });
+
 </script>
 
 @endsection
