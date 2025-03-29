@@ -1,15 +1,16 @@
 <?php
 
- namespace App\Models;
+namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable
 {
+    use Notifiable;
+    protected $table = 'users'; // Ensure this is set
 
     protected $fillable = [
         'name', 'email', 'phone', 'password',
@@ -23,121 +24,101 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public static function boot() {
+    public static function boot()
+    {
         parent::boot();
         static::creating(function ($user) {
             $user->password = Hash::make($user->password);
         });
     }
 
-
-    // User.php
-
-    
-
-    // Define the relationship to get the list of followers
-    
-
+    // ✅ Corrected: Get the list of users the current user is following
     public function getFollowingListAttribute()
     {
-       $data=  Follows::where('user_id', $this->id)->first();
-        return $data->following ? explode(',', $data->following) : [];
+        $data = Follows::where('user_id', $this->id)->first();
+        return $data ? json_decode($data->following, true) ?? [] : [];
     }
 
+    // ✅ Corrected: Get the list of users following the current user
     public function getFollowersListAttribute()
     {
-        $data=  Follows::where('user_id', $this->id)->first();
-
-        return $data->followers ? explode(',', $data->followers) : [];
+        $data = Follows::where('user_id', $this->id)->first();
+        return $data ? json_decode($data->followers, true) ?? [] : [];
     }
 
+    // ✅ Check if the user is following another user
     public function isFollowing($userId)
     {
-        $followingList = $this->followingList;
-        return in_array($userId, $followingList);
+        return in_array($userId, $this->followingList);
     }
 
-// Follow a user
-public function follow($userId)
-{
-    $currentuser = Auth::user();
-    $currentuser = User::find($currentuser->id);
-    // Increase the following count for the current user
-    $currentuser->following += 1; // Increment the following count
-    $currentuser->save(); // Save the changes
-    
-    // Increase the followers count for the user being followed
-    $euser = User::find($userId);
-    $euser->followers += 1; // Increment the followers count
-    $euser->save(); // Save the changes
-    $notification= new Notification;
-    $notification->user_id= User::find($userId)->id;
-    $notification->type= 'follow';
-    $notification->link= '/profile/view/'.Auth::user()->id;
-    $notification->data= ''.Auth::user()->name. ' started following you';
-    $notification->save();
-    
-    $follows = Follows::firstOrCreate(['user_id' => $this->id]);
-    $following = $follows->following ? explode(',', $follows->following) : [];
-    $following[] = $userId;
-    $follows->following = implode(',', array_unique($following));
-    $follows->save();
+    // ✅ Follow a user
+    public function follow($userId)
+    {
+        $currentUser = Auth::user();
+        $currentUser->increment('following');
 
-    // Add the user to the followers list of the followed user
-    Follows::firstOrCreate(['user_id' => $userId], ['followers' => ""]);
-    $follower = Follows::where('user_id', $userId)->first();
-    $followers = $follower->followers ? explode(',', $follower->followers) : [];
-    $followers[] = $this->id;
-    $follower->followers = implode(',', array_unique($followers));
-    $follower->save();
+        $euser = User::find($userId);
+        $euser->increment('followers');
 
-    
+        // Create notification
+        Notification::create([
+            'user_id' => $userId,
+            'type' => 'follow',
+            'link' => '/profile/view/' . $currentUser->id,
+            'data' => $currentUser->name . ' started following you'
+        ]);
 
+        // ✅ Corrected: Update Following List (JSON)
+        $follows = Follows::firstOrCreate(['user_id' => $currentUser->id]);
+        $following = json_decode($follows->following, true) ?? [];
+        $following[] = (int) $userId;
+        $follows->following = json_encode(array_unique($following));
+        $follows->save();
 
+        // ✅ Corrected: Update Followers List (JSON)
+        $follower = Follows::firstOrCreate(['user_id' => $userId]);
+        $followers = json_decode($follower->followers, true) ?? [];
+        $followers[] = (int) $currentUser->id;
+        $follower->followers = json_encode(array_unique($followers));
+        $follower->save();
+    }
 
-}
+    // ✅ Fixed: Unfollow a user
+    public function unfollow($userId)
+    {
+        $currentUser = Auth::user();
+        if ($currentUser->following > 0) {
+            $currentUser->decrement('following');
+        }
 
-// Unfollow a user
-public function unfollow($userId)
-{
+        $euser = User::find($userId);
+        if ($euser->followers > 0) {
+            $euser->decrement('followers');
+        }
 
-    $currentuser = Auth::user();
-     $currentuser = User::find($currentuser->id);
+        // ✅ Corrected: Remove from following list
+        $follows = Follows::where('user_id', $currentUser->id)->first();
+        if ($follows) {
+            $following = json_decode($follows->following, true) ?? [];
+            $following = array_values(array_filter($following, fn($id) => $id != $userId));
+            $follows->following = json_encode($following);
+            $follows->save();
+        }
 
-// Decrease the following count for the current user
-if ($currentuser->following > 0) {
-    $currentuser->following -= 1; // Decrement the following count
-    $currentuser->save(); // Save the changes
-}
+        // ✅ Corrected: Remove from followers list
+        $follower = Follows::where('user_id', $userId)->first();
+        if ($follower) {
+            $followers = json_decode($follower->followers, true) ?? [];
+            $followers = array_values(array_filter($followers, fn($id) => $id != $currentUser->id));
+            $follower->followers = json_encode($followers);
+            $follower->save();
+        }
+    }
 
-// Decrease the followers count for the user being unfollowed
-$euser = User::find($userId);
-
-if ($euser->followers > 0) {
-    $euser->followers -= 1; // Decrement the followers count
-    $euser->save(); // Save the changes
-}
-
-
-    $follows = Follows::where('user_id', $this->id)->first();
-    $following = $follows->following ? explode(',', $follows->following) : [];
-    $following = array_diff($following, [$userId]);
-    $follows->following = implode(',', $following);
-    $follows->save();
-
-    // Remove the user from the followers list of the followed user
-    $follower = Follows::where('user_id', $userId)->first();
-    $followers = $follower->followers ? explode(',', $follower->followers) : [];
-    $followers = array_diff($followers, [$this->id]);
-    $follower->followers = implode(',', $followers);
-    $follower->save();
-}
-
-public function notifications()
-{
-    return $this->hasMany(Notification::class);
-}
-
-
-
+    // ✅ Relationship with notifications
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

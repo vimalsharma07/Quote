@@ -76,7 +76,9 @@ class UserProfileController extends Controller
 
     public function profileview(Request $request, $id){
        
-        $loginuser= Auth::user();
+        $user= Auth::user();
+      $loginuser=  User::where('id', $user->id)->first();
+
         
         if(  isset($loginuser)  && isset($id)){
 
@@ -91,12 +93,12 @@ class UserProfileController extends Controller
     public function follow($id)
     {
         $user = User::findOrFail($id);
-        $currentUser = Auth::user();
+        $currentUsers = Auth::user();
+        $currentUser = User::where('id', $currentUsers->id)->first();
     
         if ($currentUser->id === $user->id) {
             return response()->json(['success' => false], 400);
         }
-    
         $currentUser->follow($user->id);
     
         return redirect()->back()->with(['success' => true]);

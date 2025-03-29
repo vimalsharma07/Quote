@@ -14,3 +14,14 @@ CREATE TABLE categories (
     created_at TIMESTAMP NULL DEFAULT NULL,
     updated_at TIMESTAMP NULL DEFAULT NULL
 );
+
+CREATE TABLE follows (
+    id BIGINT(20) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT(20) UNSIGNED NOT NULL,  -- Must match users.id type
+    following TEXT DEFAULT NULL,  -- Comma-separated list of followed user IDs
+    followers TEXT DEFAULT NULL,  -- Comma-separated list of follower user IDs
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
