@@ -25,7 +25,7 @@ Route::get('/home', fn() => view('front.index'));
 
 // User Authentication Routes
 Route::get('login', [UserController::class, 'showLoginForm'])->name('login');
-Route::post('user/login', [UserController::class, 'login'])->name('userlogin');
+Route::post('user/login', [UserController::class, 'login'])->name('user.login');
 Route::post('logout', [UserController::class, 'logout'])->name('logout');
 Route::get('user/register', [UserController::class, 'showRegistrationForm'])->name('register');
 Route::post('user/register', [UserController::class, 'register'])->name('user-register');
