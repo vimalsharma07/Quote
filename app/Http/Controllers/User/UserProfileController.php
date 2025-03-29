@@ -31,6 +31,7 @@ class UserProfileController extends Controller
 
     public function update(Request $request, $id)
     {
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -44,11 +45,10 @@ class UserProfileController extends Controller
         $user->email = $request->input('email');
         $user->phone = $request->input('phone');
         $user->description = $request->input('description');
-
         if ($request->hasFile('photo')) {
             // Delete old photo if exists
             if ($user->photo) {
-                $oldPhotoPath = public_path('photos/' . $user->photo);
+                $oldPhotoPath = public_path('photos/' . basename($user->photo)); // Extract filename from stored path
                 if (file_exists($oldPhotoPath)) {
                     unlink($oldPhotoPath);
                 }
@@ -62,9 +62,10 @@ class UserProfileController extends Controller
             // Move the uploaded file
             $photo->move($destinationPath, $photoName);
         
-            // Save the filename in the database
-            $user->photo = $photoName;
+            // Save the full path in the database
+            $user->photo = asset('photos/' . $photoName); // Stores full URL
         }
+        
         
 
         $user->save();

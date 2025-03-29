@@ -4,8 +4,10 @@
     <div class="container">
         <div class="profile-header">
             <div class="profile-picture-wrapper">
-                <img src="{{ $user->photo ? Storage::url('photos/' . $user->photo) : asset('images/default-profile.png') }}" alt="{{ $user->name }}" class="img-fluid rounded-circle profile-picture">
-            </div>
+                <img src="{{ $user->photo ?? asset('images/default-profile.png') }}" 
+                alt="{{ $user->name }}" 
+                class="img-fluid rounded-circle profile-picture">
+                       </div>
             <div class="profile-details">
                 <h2>{{ $user->name }}</h2>
                 <p class="profile-bio">{{ $user->description }}</p>
