@@ -55,7 +55,7 @@ $(document).ready(function () {
             success: function (response) {
                 console.log(response);
                 if (response.success) {
-                    window.location.href = '/';
+                    // window.location.href = '/';
                 } else {
                     $("#error-msg").removeClass("d-none").text(response.message);
                 }
