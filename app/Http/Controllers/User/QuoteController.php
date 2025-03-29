@@ -165,4 +165,19 @@ public function like(Request $request, $id)
         }
 
 
+        public function AllBackgrounds(Request $request){
+
+           $allBackgrounds = QuoteBackground::all();
+
+        return response()->json([
+            'backgrounds' => $allBackgrounds->map(function ($bg) {
+                return [
+                    'id' => $bg->id,
+                    'filename' => $bg->filename,
+                    'path' => asset($bg->path) // Generating full URL for the background image
+                ];
+            })
+        ]);
+        }
+
 }

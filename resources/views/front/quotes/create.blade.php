@@ -140,10 +140,10 @@
                     let thumbnails = '';
                     backgrounds.forEach(background => {
                         // Remove 'public' from the path
-                        let pathWithoutPublic = background.path.replace('public/', '');
+                        var  pathWithoutPublic = background.path;
                         thumbnails += `
                             <div class="col-4 mb-2">
-                                <img src="{{ Storage::url('${pathWithoutPublic}') }}" class="thumbnail img-fluid" data-background="${pathWithoutPublic}" height="30px">
+                                <img src="{{ asset('${pathWithoutPublic}') }}" class="thumbnail img-fluid" data-background="${pathWithoutPublic}" height="30px">
                             </div>
                         `;
                     });
