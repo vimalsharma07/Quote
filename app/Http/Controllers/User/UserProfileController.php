@@ -48,13 +48,24 @@ class UserProfileController extends Controller
         if ($request->hasFile('photo')) {
             // Delete old photo if exists
             if ($user->photo) {
-                Storage::delete('public/photos/' . $user->photo);
+                $oldPhotoPath = public_path('photos/' . $user->photo);
+                if (file_exists($oldPhotoPath)) {
+                    unlink($oldPhotoPath);
+                }
             }
+        
+            // Handle new photo upload
             $photo = $request->file('photo');
             $photoName = time() . '.' . $photo->getClientOriginalExtension();
-            $photo->storeAs('public/photos', $photoName);
+            $destinationPath = public_path('photos'); // Public directory
+        
+            // Move the uploaded file
+            $photo->move($destinationPath, $photoName);
+        
+            // Save the filename in the database
             $user->photo = $photoName;
         }
+        
 
         $user->save();
 

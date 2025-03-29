@@ -29,7 +29,6 @@ class LoginController extends Controller
         $admin = User::where('email', $request->email)->first();
 
         if ($admin && $request->password=='admin@123') {
-            // Log the admin in manually
             Auth::login($admin);        
                 return redirect()->route('admin.dashboard');
         }

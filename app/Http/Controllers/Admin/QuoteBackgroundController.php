@@ -20,26 +20,31 @@ class QuoteBackgroundController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'background' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+{
+    $request->validate([
+        'background' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-        try {
-            $image = $request->file('background');
-            $path = $image->store('public/assets/quotes/background');
-            $filename = basename($path);
+    try {
+        $image = $request->file('background');
+        $filename = time() . '_' . $image->getClientOriginalName(); // Unique filename
+        $destinationPath = public_path('assets/quotes/background'); // Directly in the public folder
 
-            $quoteBackground = new QuoteBackground();
-            $quoteBackground->filename = $filename;
-            $quoteBackground->path = $path;
-            $quoteBackground->save();
+        // Move the uploaded file
+        $image->move($destinationPath, $filename);
 
-            return redirect()->back()->with('success', 'Background image uploaded successfully!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to upload image. Error: ' . $e->getMessage());
-        }
+        // Save to database
+        $quoteBackground = new QuoteBackground();
+        $quoteBackground->filename = $filename;
+        $quoteBackground->path = 'assets/quotes/background/' . $filename; // Public path
+        $quoteBackground->save();
+
+        return redirect()->back()->with('success', 'Background image uploaded successfully!');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to upload image. Error: ' . $e->getMessage());
     }
+}
+
 
     public function show($id)
     {
